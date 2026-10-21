@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Abyss Universe - Advanced OTT</title>
+    <style>
+        /* CSS Variables for Theme Changing */
+        :root {
+            --primary: #ff3333;
+            --dark: #8b0000;
+            --bg: #070709;
+            --card-bg: #121218;
+            --text: #ffffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg); color: var(--text); padding-bottom: 75px; transition: background 0.3s; }
+
+        /* HEADER & NOTIFICATIONS */
+        header { background: rgba(15, 15, 20, 0.95); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--dark); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+        .brand { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .logo-svg { width: 32px; height: 32px; filter: drop-shadow(0 0 5px var(--primary)); transition: 0.3s; }
+        .brand-name { font-size: 18px; font-weight: 900; background: linear-gradient(90deg, var(--primary), #ffffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
+        
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .bell-icon { font-size: 20px; cursor: pointer; position: relative; }
+        .bell-dot { position: absolute; top: -2px; right: -2px; background: red; width: 10px; height: 10px; border-radius: 50%; border: 2px solid #000; }
+        .vip-btn { background: linear-gradient(45deg, #b8860b, #ffd700); color: #000; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: none; cursor: pointer; }
+
+        /* NOTIFICATION DROPDOWN */
+        .noti-dropdown { display: none; position: absolute; top: 60px; right: 10px; background: #1a1a24; border: 1px solid var(--dark); width: 250px; border-radius: 8px; padding: 10px; z-index: 200; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
+        .noti-item { border-bottom: 1px solid #333; padding: 8px 0; font-size: 12px; color: #ddd; }
+        .noti-item:last-child { border-bottom: none; }
+
+        /* COMMON */
+        .search-bar { width: 100%; padding: 10px 15px; background: #1a1a22; border: 1px solid #333; border-radius: 25px; color: #fff; font-size: 14px; margin-bottom: 12px; outline: none; }
+        .search-bar:focus { border-color: var(--primary); }
+        .section-title { font-size: 18px; margin: 15px 16px 10px; border-left: 4px solid var(--primary); padding-left: 10px; transition: 0.3s; }
+
+        /* HERO BANNER */
+        .top-controls { padding: 12px 16px; background: #0d0d11; }
+        .hero { margin: 15px; padding: 25px 20px; border-radius: 12px; background: radial-gradient(circle at top right, var(--dark), #0f0f15 70%); border: 1px solid var(--dark); transition: 0.3s; }
+        .badge-featured { background: var(--primary); color: #fff; padding: 3px 8px; font-size: 10px; font-weight: bold; border-radius: 4px; text-transform: uppercase; }
+        .hero h1 { font-size: 22px; margin: 10px 0 6px; color: #fff; }
+        .play-main-btn { background: var(--primary); color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; margin-top: 10px; width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+
+        /* VIDEO GRID */
+        .video-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 15px; }
+        .video-card { background: var(--card-bg); border-radius: 8px; overflow: hidden; border: 1px solid #252530; cursor: pointer; }
+        .thumb { height: 110px; background: linear-gradient(135deg, #1f1f2e, #0a0a0f); display: flex; justify-content: center; align-items: center; position: relative; }
+        .play-icon { width: 38px; height: 38px; background: rgba(0, 0, 0, 0.7); border: 2px solid var(--primary); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 16px; color: var(--primary); }
+        .tag { position: absolute; top: 6px; right: 6px; padding: 2px 6px; font-size: 10px; font-weight: bold; border-radius: 4px; }
+        .tag.free { background: #198754; color: #fff; }
+        .tag.vip { background: #ffd700; color: #000; }
+        .duration { position: absolute; bottom: 6px; right: 6px; background: rgba(0,0,0,0.8); padding: 2px 5px; font-size: 10px; border-radius: 3px; }
+        .card-info { padding: 10px; }
+        .card-title { font-size: 13px; font-weight: bold; margin-bottom: 4px; color: #eee; }
+        .card-meta { font-size: 11px; color: #888; }
+
+        /* PROFILE & WALLET */
+        #creatorSection, #profileSection { display: none; padding: 16px; }
+        .profile-box, .creator-box { background: var(--card-bg); border: 1px solid var(--dark); border-radius: 12px; padding: 18px; margin-bottom: 15px; text-align: center; }
+        .avatar { width: 70px; height: 70px; background: #222; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; margin: 0 auto 10px; border: 2px solid var(--primary); }
+        .wallet-box { background: linear-gradient(45deg, #111, #1a1a1a); border: 1px solid #333; padding: 15px; border-radius: 8px; margin-top: 15px; }
+        .wallet-amt { font-size: 28px; color: #00ff88; font-weight: bold; margin: 5px 0; }
+        .action-btn { width: 100%; background: var(--primary); color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; margin-top: 10px; }
+        .withdraw-btn { width: 100%; background: #28a745; color: #fff; border: none; padding: 10px; border-radius: 6px; margin-top: 15px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        
+        /* WATCHLIST SECTION IN PROFILE */
+        .watchlist-container { background: #111; border: 1px dashed var(--primary); padding: 10px; border-radius: 8px; margin-top: 15px; text-align: left; }
+        .watchlist-item { font-size: 12px; color: #ccc; border-bottom: 1px solid #333; padding: 5px 0; }
+
+        /* MODALS */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 200; justify-content: center; align-items: center; padding: 15px; }
+        .modal-content { background: var(--card-bg); width: 100%; max-width: 420px; border-radius: 10px; border: 1px solid var(--dark); overflow: hidden; }
+        .video-box { width: 100%; height: 210px; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; position: relative; }
+        .modal-body { padding: 15px; text-align: center; }
+        
+        /* VIDEO PLAYER CONTROLS (FAKE) */
+        .player-controls { position: absolute; bottom: 10px; width: 100%; display: flex; justify-content: space-around; background: rgba(0,0,0,0.6); padding: 5px 0; }
+        .p-btn { background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; }
+
+        /* SETTINGS MODAL */
+        .settings-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #333; }
+        .settings-row select { background: #222; color: #fff; border: 1px solid var(--primary); padding: 5px; border-radius: 4px; }
+        .theme-balls { display: flex; gap: 10px; }
+        .t-ball { width: 25px; height: 25px; border-radius: 50%; cursor: pointer; border: 2px solid #fff; }
+
+        /* BOTTOM NAV */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #0f0f15; border-top: 1px solid #282835; display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; }
+        .nav-item { color: #888; font-size: 11px; text-align: center; cursor: pointer; width: 25%; }
+        .nav-item.active { color: var(--primary); font-weight: bold; }
+        .nav-icon { font-size: 20px; margin-bottom: 2px; }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER & NOTIFICATIONS -->
+    <header>
+        <div class="brand" onclick="switchView('homeView', 'navHome')">
+            <svg class="logo-svg" viewBox="0 0 100 100">
+                <polygon points="50,5 95,90 5,90" fill="#111" stroke="var(--primary)" stroke-width="6"/>
+                <polygon points="50,25 78,80 22,80" fill="var(--dark)"/>
+                <circle cx="50" cy="62" r="8" fill="#ffffff"/>
+            </svg>
+            <div class="brand-name">Abyss</div>
+        </div>
+        <div class="header-right">
+            <div class="bell-icon" onclick="toggleNotifications()">
+                🔔 <div class="bell-dot"></div>
+            </div>
+            <button class="vip-btn" id="vipHeaderBtn" onclick="openModal('vipModal')">👑 VIP</button>
+        </div>
+
+        <!-- Notification Dropdown -->
+        <div class="noti-dropdown" id="notiBox">
+            <div class="noti-item" data-en="🔥 Part 2 of School Horror is now available!" data-hi="🔥 स्कूल हॉरर का पार्ट 2 अब उपलब्ध है!">🔥 School Horror Part 2 is now available!</div>
+            <div class="noti-item" data-en="💰 You earned ₹150 from Creator Studio!" data-hi="💰 आपने क्रिएटर स्टूडियो से ₹150 कमाए!">💰 You earned ₹150 from Creator Studio!</div>
+        </div>
+    </header>
+
+    <!-- 2. HOME VIEW -->
+    <div id="homeView">
+        <div class="top-controls">
+            <input type="text" id="searchInput" class="search-bar" placeholder="🔍 Search Movies & Music..." data-en-ph="🔍 Search Movies & Music..." data-hi-ph="🔍 मूवी या गाना सर्च करें..." onkeyup="searchVideos()">
+        </div>
+
+        <div class="hero">
+            <span class="badge-featured">Trending</span>
+            <h1 data-en="School of Blind Monsters" data-hi="स्कूल ऑफ ब्लाइंड मॉन्स्टर्स">School of Blind Monsters</h1>
+            <p data-en="Survival horror with sound-hunting mutants!" data-hi="आवाज़ से शिकार करने वाले म्यूटेंट्स का खौफ!">Survival horror with sound-hunting mutants!</p>
+            <button class="play-main-btn" onclick="openPlayer('School of Horror - Part 1', 'free')" data-en="▶ Play Part 1 Now" data-hi="▶ अभी पार्ट 1 देखें">▶ Play Part 1 Now</button>
+        </div>
+
+        <h2 class="section-title" data-en="Explore Universe" data-hi="यूनिवर्स एक्सप्लोर करें">Explore Universe</h2>
+        <div class="video-grid" id="videoGrid">
+            <!-- Video 1 -->
+            <div class="video-card" onclick="openPlayer('Apna Nishaan - Rap', 'free')">
+                <div class="thumb"><span class="tag free">FREE</span><div class="play-icon">▶</div></div>
+                <div class="card-info"><div class="card-title">Apna Nishaan - Rap</div><div class="card-meta">Music Video</div></div>
+            </div>
+            <!-- Video 2 -->
+            <div class="video-card" onclick="openPlayer('Part 1: The Hidden Gold', 'free')">
+                <div class="thumb"><span class="tag free">FREE</span><div class="play-icon">▶</div></div>
+                <div class="card-info"><div class="card-title">Part 1: Hidden Gold</div><div class="card-meta">Horror Series</div></div>
+            </div>
+            <!-- Video 3 -->
+            <div class="video-card" onclick="openPlayer('Part 2: The Masked Crew', 'vip')">
+                <div class="thumb"><span class="tag vip">VIP</span><div class="play-icon lock-icon">🔒</div></div>
+                <div class="card-info"><div class="card-title">Part 2: Masked Crew</div><div class="card-meta">Premium Series</div></div>
+            </div>
+            <!-- Video 4 -->
+            <div class="video-card" onclick="openPlayer('Part 3: The Safe Room', 'vip')">
+                <div class="thumb"><span class="tag vip">VIP</span><div class="play-icon lock-icon">🔒</div></div>
+                <div class="card-info"><div class="card-title">Part 3: The Safe Room</div><div class="card-meta">Premium Series</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. CREATOR STUDIO VIEW -->
+    <div id="creatorSection">
+        <div class="creator-box">
+            <h2 style="color: var(--primary); font-size: 20px;" data-en="🎬 Creator Studio" data-hi="🎬 क्रिएटर स्टूडियो">🎬 Creator Studio</h2>
+            <p style="font-size: 12px; color: #aaa; margin: 10px 0;" data-en="Upload video, pay ₹49 fee & keep 50% revenue!" data-hi="वीडियो अपलोड करें, ₹49 फीस दें और 50% कमाई करें!">Upload video, pay ₹49 fee & keep 50% revenue!</p>
+            
+            <input type="text" id="vTitle" class="search-bar" placeholder="Video Title (e.g. Zombie Attack)" style="margin-top: 10px;">
+            <select id="vType" class="search-bar">
+                <option value="free">🆓 Free Video (Ad Revenue)</option>
+                <option value="vip">👑 VIP Movie (Sub Revenue)</option>
+            </select>
+            <button class="action-btn" onclick="uploadVideo()" data-en="💳 Pay ₹49 & Publish" data-hi="💳 ₹49 पे करें और अपलोड करें">💳 Pay ₹49 & Publish</button>
+        </div>
+    </div>
+
+    <!-- 4. PROFILE & WALLET VIEW -->
+    <div id="profileSection">
+        <div class="profile-box">
+            <div class="avatar">👤</div>
+            <h2 style="color: #fff; font-size: 22px;">Tushar</h2>
+            <p id="profileStatus" style="font-size: 13px; color: #aaa; margin-top: 5px;">🆓 Free Member</p>
+            
+            <div class="wallet-box">
+                <p style="font-size: 12px; color: #aaa;" data-en="Your Earnings (50% Share)" data-hi="आपकी कमाई (50% हिस्सा)">Your Earnings (50% Share)</p>
+                <div class="wallet-amt" id="walletAmount">₹ 0.00</div>
+                <button class="withdraw-btn" onclick="withdrawMoney()" data-en="💸 Withdraw to UPI" data-hi="💸 पैसे बैंक/UPI में निकालें">💸 Withdraw to UPI</button>
+            </div>
+
+            <!-- MY WATCHLIST SECTION -->
+            <div class="watchlist-container">
+                <h4 style="color: var(--primary);" data-en="📺 My Watchlist" data-hi="📺 मेरी वॉचलिस्ट">📺 My Watchlist</h4>
+                <div id="watchListItems">
+                    <p style="font-size: 11px; color:#666; margin-top:5px;" data-en="Nothing added yet." data-hi="अभी तक कुछ सेव नहीं किया है।">Nothing added yet.</p>
+                </div>
+            </div>
+
+            <button class="action-btn" style="background: #333;" onclick="openModal('settingsModal')" data-en="⚙️ Advanced Settings" data-hi="⚙️ एडवांस्ड सेटिंग्स">⚙️ Advanced Settings</button>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <!-- PLAYER MODAL -->
+    <div class="modal" id="videoModal">
+        <div class="modal-content">
+            <div class="video-box" id="playerBox">
+                <!-- Injection via JS -->
+            </div>
+            <div class="modal-body">
+                <h3 id="modalTitle" style="color: var(--primary);">Title</h3>
+                <p id="modalStatus" style="font-size: 12px; color: #aaa;"></p>
+                
+                <div style="display:flex; justify-content: space-between; margin-top: 15px;">
+                    <button class="action-btn" style="width: 48%; background: #28a745;" onclick="addToWatchlist()" data-en="➕ Save to List" data-hi="➕ वॉचलिस्ट में सेव करें">➕ Save to List</button>
+                    <button class="action-btn" style="width: 48%; background: #444;" onclick="closeModal('videoModal')" data-en="✖ Close" data-hi="✖ बंद करें">✖ Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-body" style="text-align: left;">
+                <h3 style="color: var(--primary); margin-bottom: 20px; text-align: center;" data-en="⚙️ App Settings" data-hi="⚙️ ऐप सेटिंग्स">⚙️ App Settings</h3>
+                
+                <!-- Language Changer -->
+                <div class="settings-row">
+                    <span data-en="🌐 Language" data-hi="🌐 भाषा चुनें">🌐 Language</span>
+                    <select id="langSelect" onchange="changeLanguage()">
+                        <option value="en">English</option>
+                        <option value="hi">हिंदी (Hindi)</option>
+                    </select>
+                </div>
+
+                <!-- Theme Changer -->
+                <div class="settings-row">
+                    <span data-en="🎨 App Theme" data-hi="🎨 ऐप का रंग">🎨 App Theme</span>
+                    <div class="theme-balls">
+                        <div class="t-ball" style="background: #ff3333;" onclick="changeTheme('#ff3333', '#8b0000')"></div>
+                        <div class="t-ball" style="background: #00d4ff;" onclick="changeTheme('#00d4ff', '#005580')"></div>
+                        <div class="t-ball" style="background: #bc13fe;" onclick="changeTheme('#bc13fe', '#5e0980')"></div>
+                    </div>
+                </div>
+
+                <!-- Video Quality -->
+                <div class="settings-row">
+                    <span data-en="📺 Default Quality" data-hi="📺 वीडियो क्वालिटी">📺 Default Quality</span>
+                    <select>
+                        <option>Auto (Recommended)</option>
+                        <option>4K Ultra HD</option>
+                        <option>Data Saver</option>
+                    </select>
+                </div>
+
+                <button class="action-btn" style="background: var(--dark);" onclick="closeModal('settingsModal')" data-en="Save & Close" data-hi="सेव करें और बंद करें">Save & Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIP MODAL -->
+    <div class="modal" id="vipModal">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div style="font-size: 42px;">👑</div>
+                <h3 style="color: #ffd700; margin: 10px 0;">Abyss VIP (₹99/mo)</h3>
+                <p style="font-size: 12px; color: #ccc; margin-bottom: 15px;" data-en="Unlock all VIP AI movies & remove ads!" data-hi="सारी VIP मूवीज अनलॉक करें और विज्ञापन हटाएं!">Unlock all VIP AI movies & remove ads!</p>
+                <button onclick="activateVIP()" style="width: 100%; background: linear-gradient(45deg, #b8860b, #ffd700); color: #000; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer;">📲 Pay ₹99 (Unlock All)</button>
+                <button class="action-btn" style="background: #333;" onclick="closeModal('vipModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <div class="bottom-nav">
+        <div class="nav-item active" id="navHome" onclick="switchView('homeView', 'navHome')">
+            <div class="nav-icon">🏠</div><span data-en="Home" data-hi="होम">Home</span>
+        </div>
+        <div class="nav-item" id="navCreator" onclick="switchView('creatorSection', 'navCreator')">
+            <div class="nav-icon">➕</div><span data-en="Creator" data-hi="क्रिएटर">Creator</span>
+        </div>
+        <div class="nav-item" id="navVip" onclick="openModal('vipModal')">
+            <div class="nav-icon">👑</div><span data-en="VIP" data-hi="वीआईपी">VIP</span>
+        </div>
+        <div class="nav-item" id="navProfile" onclick="switchView('profileSection', 'navProfile')">
+            <div class="nav-icon">👤</div><span data-en="Profile" data-hi="प्रोफाइल">Profile</span>
+        </div>
+    </div>
+
+    <!-- MAGIC SCRIPTS -->
+    <script>
+        let isVIP = false;
+        let earnings = 0;
+        let currentVideo = "";
+        let watchList = [];
+
+        // View Switcher
+        function switchView(viewId, navId) {
+            document.getElementById('homeView').style.display = 'none';
+            document.getElementById('creatorSection').style.display = 'none';
+            document.getElementById('profileSection').style.display = 'none';
+            
+            document.getElementById(viewId).style.display = 'block';
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(navId).classList.add('active');
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // Notifications Toggle
+        function toggleNotifications() {
+            let box = document.getElementById('notiBox');
+            box.style.display = (box.style.display === 'block') ? 'none' : 'block';
+            document.querySelector('.bell-dot').style.display = 'none'; // Read notification
+        }
+
+        // Theme Changer
+        function changeTheme(primary, dark) {
+            document.documentElement.style.setProperty('--primary', primary);
+            document.documentElement.style.setProperty('--dark', dark);
+            alert("🎨 Theme updated successfully!");
+        }
+
+        // Language Changer (Magic Translation)
+        function changeLanguage() {
+            let lang = document.getElementById('langSelect').value;
+            // Update Text Elements
+            document.querySelectorAll('[data-en]').forEach(el => {
+                el.innerText = el.getAttribute('data-' + lang);
+            });
+            // Update Placeholders
+            document.querySelectorAll('[data-en-ph]').forEach(el => {
+                el.placeholder = el.getAttribute('data-' + lang + '-ph');
+            });
+        }
+
+        // Watchlist Logic
+        function addToWatchlist() {
+            if(!watchList.includes(currentVideo)) {
+                watchList.push(currentVideo);
+                let listDiv = document.getElementById('watchListItems');
+                if(watchList.length === 1) listDiv.innerHTML = ""; // clear empty message
+                
+                let item = document.createElement('div');
+                item.className = 'watchlist-item';
+                item.innerText = "▶ " + currentVideo;
+                listDiv.appendChild(item);
+                alert("✅ '" + currentVideo + "' saved to your Watchlist in Profile!");
+            } else {
+                alert("⚠️ यह वीडियो पहले से ही लिस्ट में है!");
+            }
+        }
+
+        // Player Logic with Extra OTT Controls
+        function openPlayer(title, type) {
+            currentVideo = title;
+            let box = document.getElementById('playerBox');
+            document.getElementById('modalTitle').innerText = title;
+            
+            if(type === 'vip' && !isVIP) {
+                box.innerHTML = `<div style="font-size: 35px;">🔒</div><h4 style="color:#ffd700">VIP Premium</h4><p style="font-size:12px; color:#aaa;">₹99 Pass Required</p><button onclick="closeModal('videoModal'); openModal('vipModal')" style="margin-top:10px; background:#ffd700; border:none; padding:5px 10px; font-weight:bold; border-radius:4px; color:#000;">Unlock VIP</button>`;
+                document.getElementById('modalStatus').innerText = "Status: Locked";
+            } else {
+                box.innerHTML = `
+                    <div style="font-size: 35px; color:var(--primary);">▶</div>
+                    <p style="color:#00ff88; font-size:12px; margin-top:5px;">Streaming 4K Ultra HD...</p>
+                    <div class="player-controls">
+                        <button class="p-btn" onclick="alert('Subtitle On/Off')">💬</button>
+                        <button class="p-btn" onclick="alert('Casting to Smart TV...')">📺</button>
+                        <button class="p-btn" onclick="alert('Video Settings')">⚙️</button>
+                    </div>
+                `;
+                document.getElementById('modalStatus').innerText = "Playing Now - Ad Free";
+            }
+            openModal('videoModal');
+        }
+
+        // VIP Logic
+        function activateVIP() {
+            isVIP = true;
+            closeModal('vipModal');
+            document.getElementById('vipHeaderBtn').innerText = "👑 VIP ACTIVE";
+            document.getElementById('profileStatus').innerText = "👑 Premium VIP Member";
+            document.getElementById('profileStatus').style.color = "#ffd700";
+            document.querySelectorAll('.lock-icon').forEach(icon => icon.innerText = "▶");
+            alert("🎉 VIP Pass Activated! You can now watch all premium parts.");
+        }
+
+        // Creator Upload
+        function uploadVideo() {
+            let title = document.getElementById('vTitle').value.trim();
+            if(!title) { alert("Please enter a video title!"); return; }
+            
+            earnings += Math.floor(Math.random() * (150 - 50 + 1) + 50); 
+            document.getElementById('walletAmount').innerText = "₹ " + earnings + ".00";
+            
+            alert("✅ ₹49 Payment Successful!\nYour video is live. Check Profile for earnings.");
+            document.getElementById('vTitle').value = "";
+        }
+
+        // Withdraw
+        function withdrawMoney() {
+            if (earnings >= 500) {
+                let upi = prompt("Enter your UPI ID to withdraw ₹" + earnings + ":");
+                if (upi) {
+                    alert("✅ Success! ₹" + earnings + " sent to " + upi);
+                    earnings = 0; 
+                    document.getElementById('walletAmount').innerText = "₹ 0.00";
+                }
+            } else {
+                alert("⚠️ Minimum withdrawal is ₹500. You need ₹" + (500 - earnings) + " more!");
+            }
+        }
+
+        // Search
+        function searchVideos() {
+            let val = document.getElementById('searchInput').value.toLowerCase();
+            document.querySelectorAll('.video-card').forEach(card => {
+                card.style.display = card.innerText.toLowerCase().includes(val) ? 'block' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>
